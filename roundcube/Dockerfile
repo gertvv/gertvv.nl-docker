@@ -56,7 +56,7 @@ RUN sed -i "s|^\(\$rcmail_config\['db_dsnw'\] =\).*$|\1 'sqlite:////var/www/roun
 
 RUN rm -r /var/www/roundcube/installer
 
-# http
-EXPOSE 80
+# ssh, http
+EXPOSE 22 80
 
 CMD ["/usr/bin/supervisord"]
