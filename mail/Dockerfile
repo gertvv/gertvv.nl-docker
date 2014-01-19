@@ -9,12 +9,11 @@ RUN sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y spamassassin
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sa-exim
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamassassin sa-exim
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
 
 ## enable root login using a certificate
 RUN mkdir -p /var/run/sshd
