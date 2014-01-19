@@ -1,7 +1,16 @@
 Mail hosting
 ============
 
-Fully configured mail hosting with SMTP and secure IMAP. Be sure to:
+Fully configured mail hosting with authenticated SMTP and secure IMAP. The
+server supports:
+
+ - Encrypted IMAP using STARTTLS on port 143 or SSL on port 993. Unencrypted
+   connections not allowed.
+ - Unencrypted SMTP on port 25 for delivery to local users.
+ - Authenticated SMTP on port 25 using STARTTLS for relay.
+ - SSH login to create additional users an aliases.
+
+Be sure to:
 
  - Add a public key to `./ssl/root_authorized_keys`
  - Save your public key chain to `./ssl/mail.pem`
@@ -26,5 +35,4 @@ To add users and aliases, login using SSH:
 TODO
 ----
 
- - Allow relay for authenticated SMTP users & enable StartTLS (https://wiki.debian.org/Exim)
  - CRON job for SpamAssassin learning (http://help.directadmin.com/item.php?id=188)
