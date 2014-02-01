@@ -2,6 +2,7 @@ FROM ubuntu:12.04
 
 # Add universe for supervisor and lighttpd
 RUN sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
+RUN apt-mark hold initscripts udev plymouth mountall
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
