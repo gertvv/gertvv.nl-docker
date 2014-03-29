@@ -23,7 +23,7 @@ Be sure to:
 Then build and start the container:
 
     $ sudo docker build -t=mail-server .
-    $ sudo docker run -d -p 2222:22 -p 25:25 -p 143:143 -p 993:993 mail-server
+    $ sudo docker run -d -name mail-server -h "mail.gertvv.nl" -p 2222:22 -p 25:25 -p 143:143 -p 993:993 mail-server /usr/bin/supervisord
 
 To add users and aliases, login using SSH:
 

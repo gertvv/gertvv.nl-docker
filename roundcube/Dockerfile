@@ -50,7 +50,7 @@ RUN cp /var/www/roundcube/config/db.inc.php.dist /var/www/roundcube/config/db.in
 RUN cp /var/www/roundcube/config/main.inc.php.dist /var/www/roundcube/config/main.inc.php
 RUN sed -i "s|^\(\$rcmail_config\['default_host'\] =\).*$|\1 'ssl://mail.gertvv.nl';|" /var/www/roundcube/config/main.inc.php
 RUN sed -i "s|^\(\$rcmail_config\['mail_domain'\] =\).*$|\1 'gertvv.nl';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['smtp_server'\] =\).*$|\1 'mail.gertvv.nl';|" /var/www/roundcube/config/main.inc.php
+RUN sed -i "s|^\(\$rcmail_config\['smtp_server'\] =\).*$|\1 'tls://mail.gertvv.nl';|" /var/www/roundcube/config/main.inc.php
 RUN sed -i "s|^\(\$rcmail_config\['smtp_user'\] =\).*$|\1 '%u';|" /var/www/roundcube/config/main.inc.php
 RUN sed -i "s|^\(\$rcmail_config\['smtp_pass'\] =\).*$|\1 '%p';|" /var/www/roundcube/config/main.inc.php
 RUN sed -i "s|^\(\$rcmail_config\['db_dsnw'\] =\).*$|\1 'sqlite:////var/www/roundcube/db/sqlite.db?mode=0646';|" /var/www/roundcube/config/db.inc.php
