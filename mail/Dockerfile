@@ -32,6 +32,9 @@ RUN sed -i 's/^SAEximRunCond: 0$/#SAEximRunCond: 0/' /etc/exim4/sa-exim.conf
 # Enable TLS
 RUN sed -i '1iMAIN_TLS_ENABLE = yes\nMAIN_TLS_PRIVATEKEY = /etc/exim4/mail.key\nMAIN_TLS_CERTIFICATE = /etc/exim4/mail.pem\n' /etc/exim4/exim4.conf.template
 RUN usermod -a -G ssl-cert Debian-exim
+# Enable port 465
+RUN sed -i 's/SMTPLISTENEROPTIONS=.*/SMTPLISTENEROPTIONS='"'"'-oX 465:25'"'"'/' /etc/default/exim4
+RUN sed -i '/\.ifdef MAIN_TLS_ENABLE/atls_on_connect_ports=465' /etc/exim4/exim4.conf.template
 # Enable authentication
 RUN echo 'plain_saslauthd_server:\n  driver = plaintext\n  public_name = PLAIN\n  server_condition = ${if saslauthd{{$auth2}{$auth3}}{1}{0}}\n  server_set_id = $auth2\n  server_prompts = :\n  .ifndef AUTH_SERVER_ALLOW_NOTLS_PASSWORDS\n  server_advertise_condition = ${if eq{$tls_cipher}{}{}{*}}\n  .endif' >>/etc/exim4/exim4.conf.template
 RUN usermod -a -G sasl Debian-exim
@@ -62,7 +65,7 @@ RUN chgrp ssl-cert /etc/exim4/mail.key /etc/exim4/mail.pem
 ## supervisor configuration
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# ssh, smtp, imap, imaps
-EXPOSE 22 25 143 993
+# ssh, smtp, smtps, imap, imaps
+EXPOSE 22 25 465 143 993
 
 CMD ["/usr/bin/supervisord"]
