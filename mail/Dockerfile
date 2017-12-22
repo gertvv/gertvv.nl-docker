@@ -2,28 +2,14 @@
 #
 #  - use the sshd to add users and edit /etc/aliases
 
-FROM ubuntu:12.04
+FROM phusion/baseimage:0.9.22
 
-# Add universe for supervisor
-RUN sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
-RUN apt-mark hold initscripts udev plymouth mountall
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamassassin sa-exim
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamassassin sa-exim procmail
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y procmail
-
-## enable root login using a certificate
-RUN mkdir -p /var/run/sshd
-RUN mkdir /root/.ssh
-ADD ssl/root_authorized_keys /root/.ssh/authorized_keys
-RUN chown root.root /root/.ssh/authorized_keys
 
 ## exim4 configuration
 ADD mailname /etc/mailname
@@ -51,6 +37,9 @@ RUN sed -i 's/^#ssl =.*/ssl = required/' /etc/dovecot/conf.d/10-ssl.conf
 RUN sed -i 's/^ssl_cert =.*/ssl_cert = <\/etc\/ssl\/certs\/mail.pem/' /etc/dovecot/conf.d/10-ssl.conf
 RUN sed -i 's/^ssl_key =.*/ssl_key = <\/etc\/ssl\/private\/mail.key/' /etc/dovecot/conf.d/10-ssl.conf
 RUN sed -i 's/^#log_path =.*/log_path = \/dev\/stderr/' /etc/dovecot/conf.d/10-logging.conf
+# add run directory
+RUN mkdir /var/run/dovecot
+RUN chown dovecot /var/run/dovecot
 
 ## SSL certificates
 ADD ssl/mail.key /etc/ssl/private/mail.key
@@ -64,10 +53,29 @@ RUN cp /etc/ssl/private/mail.key /etc/exim4/
 RUN cp /etc/ssl/certs/mail.pem /etc/exim4/
 RUN chgrp ssl-cert /etc/exim4/mail.key /etc/exim4/mail.pem
 
-## supervisor configuration
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+## SpamAssassin user
+RUN useradd -r -m -d /var/lib/spamd -c 'SpamAssassin Daemon' spamd
+
+## Add runit scripts
+RUN mkdir /etc/service/saslauthd
+COPY service/saslauthd.sh /etc/service/saslauthd/run
+RUN chmod +x /etc/service/saslauthd/run
+
+RUN mkdir /etc/service/exim4
+COPY service/exim4.sh /etc/service/exim4/run
+RUN chmod +x /etc/service/exim4/run
+
+RUN mkdir /etc/service/spamd
+COPY service/spamd.sh /etc/service/spamd/run
+RUN chmod +x /etc/service/spamd/run
+
+RUN mkdir /etc/service/dovecot
+COPY service/dovecot.sh /etc/service/dovecot/run
+RUN chmod +x /etc/service/dovecot/run
+
+RUN mkdir /var/log/runit
 
 # ssh, smtp, smtps, imap, imaps
 EXPOSE 22 25 465 143 993
 
-CMD ["/usr/bin/supervisord"]
+CMD ["/sbin/my_init"]
