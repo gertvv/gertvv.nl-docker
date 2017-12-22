@@ -17,6 +17,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamass
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y procmail
+
 ## enable root login using a certificate
 RUN mkdir -p /var/run/sshd
 RUN mkdir /root/.ssh
