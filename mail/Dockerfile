@@ -1,6 +1,6 @@
 # Fully configured mail server with SMTP, IMAP and SpamAssassin
 #
-#  - use the sshd to add users and edit /etc/aliases
+#  - use `docker exec` to add users and edit /etc/aliases
 
 FROM phusion/baseimage:0.9.22
 
