@@ -1,36 +1,23 @@
-FROM ubuntu:12.04
+FROM phusion/baseimage:0.10.1
 
-# Add universe for supervisor and lighttpd
-RUN sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
-RUN apt-mark hold initscripts udev plymouth mountall
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
-# Install supervisor, openssh
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openssh-server 
-
 # Install lighttpd, php, sqlite
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lighttpd
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y php5 php5-cgi php5-mcrypt php5-pspell
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite php5-sqlite
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y php php-cgi php-mcrypt php-pspell php-xml php-mbstring
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite php-sqlite3
 
 # Install curl
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl
 
 # Download roundcube
-RUN curl -L "http://sourceforge.net/projects/roundcubemail/files/roundcubemail/0.9.5/roundcubemail-0.9.5.tar.gz/download" | tar xzf -
-RUN mv roundcubemail-0.9.5 /var/www/roundcube
+RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/1.3.7/roundcubemail-1.3.7-complete.tar.gz" | tar xzf -
+RUN mv roundcubemail-1.3.7 /var/www/roundcube
 RUN mkdir /var/www/roundcube/db
 RUN chown www-data.www-data /var/www/roundcube/temp
 RUN chown www-data.www-data /var/www/roundcube/logs
 RUN chown www-data.www-data /var/www/roundcube/db
-
-## enable root login using a certificate
-RUN mkdir -p /var/run/sshd
-RUN mkdir /root/.ssh
-ADD ssl/root_authorized_keys /root/.ssh/authorized_keys
-RUN chown root.root /root/.ssh/authorized_keys
 
 ## SSL certificates
 ADD ssl/mail.key /etc/ssl/private/mail.key
@@ -38,26 +25,29 @@ RUN chmod 0400 /etc/ssl/private/mail.key
 ADD ssl/mail.pem /etc/ssl/certs/mail.pem
 RUN chmod 0444 /etc/ssl/certs/mail.pem
 
-## supervisor configuration
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 ## lighttpd configuration
 ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
-RUN lighttpd-enable-mod fastcgi fastcgi-php
+RUN lighty-enable-mod fastcgi
+RUN lighty-enable-mod fastcgi-php
+RUN mkdir /var/run/lighttpd
+RUN chown www-data.www-data /var/run/lighttpd
 
 ## roundcube configuration
-RUN cp /var/www/roundcube/config/db.inc.php.dist /var/www/roundcube/config/db.inc.php
-RUN cp /var/www/roundcube/config/main.inc.php.dist /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['default_host'\] =\).*$|\1 'ssl://mail.gertvv.nl';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['mail_domain'\] =\).*$|\1 'gertvv.nl';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['smtp_server'\] =\).*$|\1 'tls://mail.gertvv.nl';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['smtp_user'\] =\).*$|\1 '%u';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['smtp_pass'\] =\).*$|\1 '%p';|" /var/www/roundcube/config/main.inc.php
-RUN sed -i "s|^\(\$rcmail_config\['db_dsnw'\] =\).*$|\1 'sqlite:////var/www/roundcube/db/sqlite.db?mode=0646';|" /var/www/roundcube/config/db.inc.php
+RUN cp /var/www/roundcube/config/config.inc.php.sample /var/www/roundcube/config/config.inc.php
+RUN sed -i "s|^\(\$config\['default_host'\] =\).*$|\1 'ssl://mail.gertvv.nl';|" /var/www/roundcube/config/config.inc.php
+RUN sed -i "s|^\(\$config\['smtp_server'\] =\).*$|\1 'tls://mail.gertvv.nl';|" /var/www/roundcube/config/config.inc.php
+RUN sed -i "s|^\(\$config\['db_dsnw'\] =\).*$|\1 'sqlite:////var/www/roundcube/db/sqlite.db?mode=0646';|" /var/www/roundcube/config/config.inc.php
+RUN sed -i "s|^\(\$config\['des_key'\] =\).*$|\1 '$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1)';|" /var/www/roundcube/config/config.inc.php
 
 RUN rm -r /var/www/roundcube/installer
 
-# ssh, http
-EXPOSE 22 80
+## Add runit scripts
+RUN mkdir /etc/service/lighttpd
+COPY service/lighttpd.sh /etc/service/lighttpd/run
+RUN chmod +x /etc/service/lighttpd/run
 
-CMD ["/usr/bin/supervisord"]
+RUN mkdir /var/log/runit
+
+## Image configuration
+EXPOSE 80
+CMD ["/sbin/my_init"]
