@@ -12,4 +12,4 @@ Fully configured mail hosting with SMTP and secure IMAP. Be sure to:
 Then build and start the container:
 
     $ sudo docker build -t=roundcube .
-    $ sudo docker run -d -p 2223:22 -p 8080:80 roundcube
+    $ sudo docker run -d -p 8080:80 roundcube

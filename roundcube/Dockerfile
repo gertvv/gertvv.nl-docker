@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.10.1
+FROM phusion/baseimage:0.10.2
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
@@ -12,8 +12,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite php-sqlite3
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl
 
 # Download roundcube
-RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/1.3.7/roundcubemail-1.3.7-complete.tar.gz" | tar xzf -
-RUN mv roundcubemail-1.3.7 /var/www/roundcube
+RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/1.3.8/roundcubemail-1.3.8-complete.tar.gz" | tar xzf -
+RUN mv roundcubemail-1.3.8 /var/www/roundcube
 RUN mkdir /var/www/roundcube/db
 RUN chown www-data.www-data /var/www/roundcube/temp
 RUN chown www-data.www-data /var/www/roundcube/logs
