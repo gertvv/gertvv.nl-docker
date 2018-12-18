@@ -75,7 +75,7 @@ RUN chmod +x /etc/service/dovecot/run
 
 RUN mkdir /var/log/runit
 
-# ssh, smtp, smtps, imap, imaps
-EXPOSE 22 25 465 143 993
+# smtp, smtps, imap, imaps
+EXPOSE 25 465 143 993
 
 CMD ["/sbin/my_init"]
