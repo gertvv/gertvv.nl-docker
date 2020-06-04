@@ -14,16 +14,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl
 # Download roundcube
 RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/1.4.5/roundcubemail-1.4.5-complete.tar.gz" | tar xzf -
 RUN mv roundcubemail-1.4.5 /var/www/roundcube
+RUN chown -R root.root /var/www/roundcube
 RUN mkdir /var/www/roundcube/db
 RUN chown www-data.www-data /var/www/roundcube/temp
 RUN chown www-data.www-data /var/www/roundcube/logs
 RUN chown www-data.www-data /var/www/roundcube/db
-
-## SSL certificates
-ADD ssl/mail.key /etc/ssl/private/mail.key
-RUN chmod 0400 /etc/ssl/private/mail.key
-ADD ssl/mail.pem /etc/ssl/certs/mail.pem
-RUN chmod 0444 /etc/ssl/certs/mail.pem
 
 ## lighttpd configuration
 ADD lighttpd.conf /etc/lighttpd/lighttpd.conf
