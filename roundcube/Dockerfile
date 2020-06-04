@@ -4,8 +4,8 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 # Install lighttpd, php, sqlite
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lighttpd
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y php php-cgi php-pspell php-xml php-mbstring
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lighttpd php-cgi libterm-readline-gnu-perl
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y php php-pspell php-xml php-mbstring php-zip
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite php-sqlite3
 
 # Install curl
