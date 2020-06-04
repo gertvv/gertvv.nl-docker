@@ -17,6 +17,12 @@ Be sure to:
  - Set your mailname in `./mailname`
  - Set the domains for which you accept e-mail in
    `./exim4/update-exim4.conf.conf`
+ - Set up users in the following files (to be appended to the corresponding
+   files in `/etc`):
+    - users/passwd
+    - users/shadow
+    - users/group
+    - users/aliases
 
 You also need to create a container MAILDATA that exposes the volumes `/var/mail` and `/home`.
 
@@ -24,13 +30,6 @@ Then build and start the container:
 
     $ sudo docker build -t=mail-server .
     $ sudo docker run -d --name mail-server -h "mail.gertvv.nl" -volumes-from MAILDATA -p 25:25 -p 465:465 -p 143:143 -p 993:993 mail-server
-
-To add users and aliases, use docker exec: 
-
-    $ docker exec -t -i mail-server /bin/bash
-    # adduser gert
-    ...
-    # echo 'root: gert' >> /etc/aliases
 
 Testing
 -------

@@ -1,6 +1,7 @@
 # Fully configured mail server with SMTP, IMAP and SpamAssassin
 #
-#  - use `docker exec` to add users and edit /etc/aliases
+# The ./etc/passwd, ./etc/shadow, ./etc/aliases contents will be appended to
+# the corresponding files in /etc
 
 FROM phusion/baseimage:0.11
 
@@ -12,8 +13,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin
 
 ## exim4 configuration
-ADD mailname /etc/mailname
-ADD exim4 /etc/exim4
+COPY mailname /etc/mailname
+COPY exim4 /etc/exim4
 # Enable spamassassin
 RUN sed -i '1ilocal_scan_path = /usr/lib/exim4/local_scan/sa-exim.so\n' /etc/exim4/exim4.conf.template
 RUN sed -i 's/^SAEximRunCond: 0$/#SAEximRunCond: 0/' /etc/exim4/sa-exim.conf
@@ -41,18 +42,6 @@ RUN sed -i 's/^#log_path =.*/log_path = \/dev\/stderr/' /etc/dovecot/conf.d/10-l
 RUN mkdir /var/run/dovecot
 RUN chown dovecot /var/run/dovecot
 
-## SSL certificates
-ADD ssl/mail.key /etc/ssl/private/mail.key
-RUN chmod 0440 /etc/ssl/private/mail.key
-ADD ssl/mail.pem /etc/ssl/certs/mail.pem
-RUN chmod 0444 /etc/ssl/certs/mail.pem
-RUN chown root.ssl-cert /etc/ssl/private/mail.key /etc/ssl/certs/mail.pem
-
-# For some reason Exim refuses to read the certificates from /etc/ssl
-RUN cp /etc/ssl/private/mail.key /etc/exim4/
-RUN cp /etc/ssl/certs/mail.pem /etc/exim4/
-RUN chgrp ssl-cert /etc/exim4/mail.key /etc/exim4/mail.pem
-
 ## SpamAssassin user
 RUN useradd -r -m -d /var/lib/spamd -c 'SpamAssassin Daemon' spamd
 
@@ -74,6 +63,26 @@ COPY service/dovecot.sh /etc/service/dovecot/run
 RUN chmod +x /etc/service/dovecot/run
 
 RUN mkdir /var/log/runit
+
+## SSL certificates
+COPY ssl/mail.key /etc/ssl/private/mail.key
+RUN chmod 0440 /etc/ssl/private/mail.key
+COPY ssl/mail.pem /etc/ssl/certs/mail.pem
+RUN chmod 0444 /etc/ssl/certs/mail.pem
+RUN chown root.ssl-cert /etc/ssl/private/mail.key /etc/ssl/certs/mail.pem
+
+# For some reason Exim refuses to read the certificates from /etc/ssl (TODO: check this is still the case)
+RUN cp /etc/ssl/private/mail.key /etc/exim4/
+RUN cp /etc/ssl/certs/mail.pem /etc/exim4/
+RUN chgrp ssl-cert /etc/exim4/mail.key /etc/exim4/mail.pem
+
+## Users
+COPY users /root/users
+RUN cat /root/users/passwd >> /etc/passwd
+RUN cat /root/users/shadow >> /etc/shadow
+RUN cat /root/users/group >> /etc/group
+RUN cat /root/users/aliases >> /etc/aliases
+RUN rm -rf /root/users
 
 # smtp, smtps, imap, imaps
 EXPOSE 25 465 143 993
