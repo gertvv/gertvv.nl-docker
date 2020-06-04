@@ -80,8 +80,8 @@ Encode credentials for SMTP AUTH PLAIN:
 
 Test StartTLS and authentication for SMTP:
 
-    $ echo 'test\0test\01234' | base64
-    $ openssl s_client -connect localhost:25 -starttls smtp
+    $ echo -ne 'test\0test\01234' | base64
+    $ openssl s_client -quiet -connect localhost:25 -starttls smtp
     < 220 mail.gertvv.nl ESMTP Exim 4.86_2 Ubuntu Tue, 02 Jan 2018 14:52:33 +0000
     > EHLO mail.gertvv.nl
     < 250-mail.gertvv.nl Hello mail.gertvv.nl [172.17.0.1]
@@ -92,12 +92,12 @@ Test StartTLS and authentication for SMTP:
 
 Test SSL for SMTP:
 
-    $ openssl s_client -connect localhost:465
+    $ openssl s_client -quiet -connect localhost:465
     < 220 mail.gertvv.nl ESMTP Exim 4.86_2 Ubuntu Tue, 02 Jan 2018 14:52:33 +0000
 
 Test StartTLS for IMAP:
 
-    $ openssl s_client -connect localhost:143 -starttls imap
+    $ openssl s_client -quiet -connect localhost:143 -starttls imap
     > a login "user" "pass"
     < a OK [CAPABILITY ...] Logged in
     > b select inbox
@@ -106,10 +106,17 @@ Test StartTLS for IMAP:
     < * 1 RECENT
     < ...
     < b OK [READ-WRITE] Select completed (0.000 + 0.000 secs).
+    > c fetch 1:1 (BODY[HEADER.FIELDS (Subject)])
+    < * 1 FETCH (FLAGS (\Seen \Recent) BODY[HEADER.FIELDS (SUBJECT)] {24}
+    < Subject: testing 123
+    <
+    < )
+    < c OK Fetch completed (0.003 + 0.000 + 0.002 secs).
+
 
 Test SSL for IMAP:
 
-    $ openssl s_client -connect localhost:993
+    $ openssl s_client -quiet -connect localhost:993
     > a login "user" "pass"
     < a OK [CAPABILITY ...] Logged in
 

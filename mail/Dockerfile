@@ -2,7 +2,7 @@
 #
 #  - use `docker exec` to add users and edit /etc/aliases
 
-FROM phusion/baseimage:0.9.22
+FROM phusion/baseimage:0.11
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
