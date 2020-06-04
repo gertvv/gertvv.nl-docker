@@ -35,8 +35,8 @@ RUN sed -i 's/^#mail_access_groups =.*/mail_access_groups = mail/' /etc/dovecot/
 RUN sed -i 's/^#mail_location =.*/mail_location = mbox:~\/mail:INBOX=\/var\/mail\/%u/' /etc/dovecot/conf.d/10-mail.conf
 # require SSL for all connections
 RUN sed -i 's/^ssl =.*/ssl = required/' /etc/dovecot/conf.d/10-ssl.conf
-RUN sed -i 's/^#ssl_cert =.*/ssl_cert = <\/etc\/ssl\/certs\/mail.pem/' /etc/dovecot/conf.d/10-ssl.conf
-RUN sed -i 's/^#ssl_key =.*/ssl_key = <\/etc\/ssl\/private\/mail.key/' /etc/dovecot/conf.d/10-ssl.conf
+RUN sed -i 's/^ssl_cert =.*/ssl_cert = <\/etc\/ssl\/certs\/mail.pem/' /etc/dovecot/conf.d/10-ssl.conf
+RUN sed -i 's/^ssl_key =.*/ssl_key = <\/etc\/ssl\/private\/mail.key/' /etc/dovecot/conf.d/10-ssl.conf
 RUN sed -i 's/^#log_path =.*/log_path = \/dev\/stderr/' /etc/dovecot/conf.d/10-logging.conf
 # add run directory
 RUN mkdir /var/run/dovecot
