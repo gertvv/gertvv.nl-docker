@@ -34,6 +34,25 @@ Then build and start the container:
 Testing
 -------
 
+A fully automated test suite can be run using pytest:
+
+```
+MAIL_SERVER_HOSTNAME=mail.gertvv.nl \
+MAIL_SERVER_CONTAINER_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' mail-server) \
+MAIL_SERVER_USERNAME=<username> \
+MAIL_SERVER_PASSWORD=<password> \
+python3 -m pytest
+```
+
+When running without a the MAILDATA volumes attached, create the home directory first:
+
+```
+mkhomedir_helper <username>
+```
+
+Manual testing
+--------------
+
 Generate a self-signed certificate for testing:
 
     $ openssl req -newkey rsa:2048 -nodes -keyout mail.key -x509 -days 365 -out mail.pem
