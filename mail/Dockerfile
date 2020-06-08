@@ -1,9 +1,4 @@
-# Fully configured mail server with SMTP, IMAP and SpamAssassin
-#
-# The ./etc/passwd, ./etc/shadow, ./etc/aliases contents will be appended to
-# the corresponding files in /etc
-
-FROM phusion/baseimage:0.11
+FROM phusion/baseimage:focal-1.0.0-alpha1-amd64
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
