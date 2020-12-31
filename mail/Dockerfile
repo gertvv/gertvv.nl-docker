@@ -3,9 +3,13 @@ FROM phusion/baseimage:focal-1.0.0-alpha1-amd64
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamassassin sa-exim procmail
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  exim4-daemon-heavy \
+  spamassassin \
+  sa-exim \
+  procmail \
+  dovecot-imapd \
+  sasl2-bin
 
 ## exim4 configuration
 COPY mailname /etc/mailname
@@ -13,6 +17,8 @@ COPY exim4 /etc/exim4
 # Enable spamassassin
 RUN sed -i '1ilocal_scan_path = /usr/lib/exim4/local_scan/sa-exim.so\n' /etc/exim4/exim4.conf.template
 RUN sed -i 's/^SAEximRunCond: 0$/#SAEximRunCond: 0/' /etc/exim4/sa-exim.conf
+# Enable spamassassin updates
+RUN echo '0 4 * * * root sa-update && kill -HUP $(ps -e | grep spamd | grep -v child | awk '"'"'{ print $1; }'"'"')' >> /etc/crontab
 # Enable TLS
 RUN sed -i '1iMAIN_TLS_ENABLE = yes\nMAIN_TLS_PRIVATEKEY = /etc/exim4/mail.key\nMAIN_TLS_CERTIFICATE = /etc/exim4/mail.pem\n' /etc/exim4/exim4.conf.template
 RUN usermod -a -G ssl-cert Debian-exim
