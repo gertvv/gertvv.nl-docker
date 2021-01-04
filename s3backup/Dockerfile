@@ -1,9 +1,10 @@
-FROM python:3
+FROM ruby:2.7-buster
 
 WORKDIR /usr/src/app
 
-RUN pip install --no-cache-dir boto3
+COPY Gemfile Gemfile.lock ./
+RUN  bundle config set --local path ./vendor/bundle
+RUN  bundle install
+COPY s3backup.sh rsa_key s3put.rb ./
 
-COPY s3backup.py .
-
-CMD [ "python", "./s3backup.py" ]
+CMD [ "./s3backup.sh" ]
