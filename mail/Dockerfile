@@ -34,6 +34,8 @@ RUN update-exim4.conf
 # use mbox format
 RUN sed -i 's/^#mail_access_groups =.*/mail_access_groups = mail/' /etc/dovecot/conf.d/10-mail.conf
 RUN sed -i 's/^#mail_location =.*/mail_location = mbox:~\/mail:INBOX=\/var\/mail\/%u/' /etc/dovecot/conf.d/10-mail.conf
+# consider adding autoexpunge for Trash and Junk:
+# https://notes.sagredo.eu/en/qmail-notes-185/expunging-expired-junk-and-trash-emails-with-dovecot-124.html
 # require SSL for all connections
 RUN sed -i 's/^ssl =.*/ssl = required/' /etc/dovecot/conf.d/10-ssl.conf
 RUN sed -i 's/^ssl_cert =.*/ssl_cert = <\/etc\/ssl\/certs\/mail.pem/' /etc/dovecot/conf.d/10-ssl.conf
