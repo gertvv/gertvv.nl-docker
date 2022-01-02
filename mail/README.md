@@ -29,7 +29,7 @@ You also need to create a container MAILDATA that exposes the volumes `/var/mail
 Then build and start the container:
 
     $ sudo docker build -t=mail-server .
-    $ sudo docker run -d --name mail-server -h "mail.gertvv.nl" -volumes-from MAILDATA -p 25:25 -p 465:465 -p 143:143 -p 993:993 mail-server
+    $ sudo docker run -d --name mail-server -h "mail.gertvv.nl" --volumes-from MAILDATA -p 25:25 -p 465:465 -p 143:143 -p 993:993 mail-server
 
 Testing
 -------
