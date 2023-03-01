@@ -1,0 +1,33 @@
+#!/bin/bash -e
+
+BUCKET="$1"
+DIR=$(dirname -- "$( readlink -f -- "$0"; )")
+
+if [[ -z "$BUCKET" ]]; then
+  echo "Expected a bucket name as argument";
+  exit 1
+fi
+
+if [[ ! -d todo ]]; then
+  echo "Expected a 'todo' directory";
+  exit 1
+fi
+
+if [[ ! -d done ]]; then
+  echo "Expected a 'done' directory";
+  exit 1
+fi
+
+pushd todo
+IFS=$'\n'
+for i in $(find .); do
+  if [[ -d "$i" ]]; then
+    mkdir -p "../done/$i"
+  else
+    date
+    du -hs "$i"
+    "${DIR}/s3put" "${i:2}" "$BUCKET" && mv "$i" "../done/$i"
+    date
+  fi
+done
+popd

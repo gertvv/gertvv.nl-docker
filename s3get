@@ -1,0 +1,4 @@
+#!/bin/bash -e
+. ${HOME}/.rsa_key_passphrase
+S3BACKUP=${HOME}/Documents/repos/gertvv.nl-docker/s3backup
+BUNDLE_GEMFILE=${S3BACKUP}/Gemfile bundle exec ${S3BACKUP}/s3get.rb "$1" "$2"
