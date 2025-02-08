@@ -31,31 +31,43 @@ Then build and start the container:
     $ sudo docker build -t=mail-server .
     $ sudo docker run -d --name mail-server -h "mail.gertvv.nl" --volumes-from MAILDATA -p 25:25 -p 465:465 -p 143:143 -p 993:993 mail-server
 
+
 Testing
 -------
+
+Generate a self-signed certificate for testing:
+
+```
+openssl req -newkey rsa:2048 -nodes -keyout ssl/mail.key -x509 -days 365 -out ssl/mail.pem
+```
+
+*Important*: set the Common Name to the mail server hostname (mail.gertvv.nl).
+
+Run unpriviliged:
+
+```
+docker build -t=mail-server .
+docker run -d --name mail-server -h "mail.gertvv.nl" -p 1025:25 -p 1465:465 -p 1143:143 -p 1993:993 mail-server
+```
+
+Add a user:
+```
+docker exec mail-server useradd gert
+docker exec mail-server mkhomedir_helper gert 
+docker exec -ti mail-server passwd gert
+```
 
 A fully automated test suite can be run using pytest:
 
 ```
 MAIL_SERVER_HOSTNAME=mail.gertvv.nl \
-MAIL_SERVER_CONTAINER_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' mail-server) \
 MAIL_SERVER_USERNAME=<username> \
 MAIL_SERVER_PASSWORD=<password> \
 python3 -m pytest
 ```
 
-When running without a the MAILDATA volumes attached, create the home directory first:
-
-```
-mkhomedir_helper <username>
-```
-
 Manual testing
 --------------
-
-Generate a self-signed certificate for testing:
-
-    $ openssl req -newkey rsa:2048 -nodes -keyout mail.key -x509 -days 365 -out mail.pem
 
 Test local delivery via SMTP:
 

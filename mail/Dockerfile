@@ -3,7 +3,7 @@
 # The ./etc/passwd, ./etc/shadow, ./etc/aliases contents will be appended to
 # the corresponding files in /etc
 
-FROM phusion/baseimage:0.11
+FROM docker.io/phusion/baseimage:noble-1.0.0
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
