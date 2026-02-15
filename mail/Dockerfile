@@ -84,6 +84,9 @@ RUN cat /root/users/group >> /etc/group
 RUN cat /root/users/aliases >> /etc/aliases
 RUN rm -rf /root/users
 
+## Automatically run sa-update
+RUN echo '0 2 * * * sa-update' | crontab -
+
 # smtp, smtps, imap, imaps
 EXPOSE 25 465 143 993
 
