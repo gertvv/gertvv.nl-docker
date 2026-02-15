@@ -3,14 +3,14 @@
 # The ./etc/passwd, ./etc/shadow, ./etc/aliases contents will be appended to
 # the corresponding files in /etc
 
-FROM docker.io/phusion/baseimage:noble-1.0.0
+FROM docker.io/phusion/baseimage:noble-1.0.2
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y exim4-daemon-heavy spamassassin sa-exim procmail
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y dovecot-imapd
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sasl2-bin util-linux
 
 ## exim4 configuration
 COPY mailname /etc/mailname
