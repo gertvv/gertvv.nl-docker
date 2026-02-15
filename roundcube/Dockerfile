@@ -1,4 +1,4 @@
-FROM docker.io/phusion/baseimage:noble-1.0.0
+FROM docker.io/phusion/baseimage:noble-1.0.2
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
@@ -12,8 +12,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y sqlite3 php-sqlite3
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y curl
 
 # Download roundcube
-RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/1.6.9/roundcubemail-1.6.9-complete.tar.gz" | tar xzf -
-RUN mv roundcubemail-1.6.9 /var/www/roundcube
+ARG ROUNDCUBE_VERSION=1.6.13
+RUN curl -L "https://github.com/roundcube/roundcubemail/releases/download/${ROUNDCUBE_VERSION}/roundcubemail-${ROUNDCUBE_VERSION}-complete.tar.gz" | tar xzf -
+RUN mv "roundcubemail-${ROUNDCUBE_VERSION}" /var/www/roundcube
 RUN chown -R root:root /var/www/roundcube
 RUN mkdir /var/www/roundcube/db
 RUN chown www-data:www-data /var/www/roundcube/temp
